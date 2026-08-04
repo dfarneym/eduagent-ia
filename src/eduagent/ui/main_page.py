@@ -1,6 +1,15 @@
+"""
+Responsável por montar a tela.
+
+Ele apenas organiza os componentes.
+
+Nunca terá lógica de negócio.
+
+"""
 import streamlit as st
 
 from eduagent.config.settings import settings
+from eduagent.ui.sidebar import render_sidebar
 
 
 def run_app():
@@ -10,6 +19,9 @@ def run_app():
         page_icon="🎓",
         layout="wide"
     )
+
+    render_sidebar()
+
     # O título da aplicação
     st.title("🎓 EduAgent AI")
     # O subtítulo da aplicação
