@@ -10,7 +10,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     # LLM
     GOOGLE_API_KEY: str = ""
-    MODEL_NAME: str = "gemini-2.5-flash"
+    MODEL_NAME: str = "gemini-3.1-flash-lite"
 
     # DiretóriosEvitamos de escrever vários arquivos
     DOCUMENTS_PATH: str = "data/documents"
