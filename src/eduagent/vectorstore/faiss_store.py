@@ -24,17 +24,33 @@ class FAISSStore:
     def search(self, query: str, k: int = 4):
         """Realiza uma busca por similaridade."""
         if self.vectorstore is None:
-            raise ValueError("O vector store ainda não foi criado.")
+            raise ValueError(
+                "O vector store ainda não foi criado."
+            )
 
         return self.vectorstore.similarity_search(
             query,
             k=k,
         )
+    def search_with_score(self, query: str, k: int = 4):
+        """Realiza uma busca por similaridade retornando os scores."""
 
+        if self.vectorstore is None:
+            raise ValueError(
+                "O vector store ainda não foi criado."
+            )
+
+        return self.vectorstore.similarity_search_with_score(
+            query,
+            k=k,
+        )
+    
     def as_retriever(self, k: int = 4):
         """Retorna o vector store como retriever."""
         if self.vectorstore is None:
-            raise ValueError("O vector store ainda não foi criado.")
+            raise ValueError(
+                "O vector store ainda não foi criado."
+            )
 
         return self.vectorstore.as_retriever(
             search_kwargs={"k": k}

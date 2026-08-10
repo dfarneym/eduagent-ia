@@ -1,18 +1,21 @@
 """
-Essa BaseSettings importação permite carregar automaticamente as configurações
-do arquivo .env.
-Já SettingsConfigDict informa ao Pydantic onde está o  .env
-e como ele deve ser lido
+Configurações da aplicação.
+
+As variáveis podem ser carregadas automaticamente
+a partir do arquivo .env.
 """
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Essa classe representa todas as configurações da aplicação
-class Settings(BaseSettings):
-    # LLM
-    GOOGLE_API_KEY: str = ""
-    MODEL_NAME: str = "gemini-3.1-flash-lite"
 
-    # DiretóriosEvitamos de escrever vários arquivos
+class Settings(BaseSettings):
+    """Representa as configurações da aplicação."""
+
+    # LLM
+    GROQ_API_KEY: str = ""
+    MODEL_NAME: str = "llama-3.3-70b-versatile"
+
+    # Diretórios
     DOCUMENTS_PATH: str = "data/documents"
     VECTORSTORE_PATH: str = "data/vectorstore"
 
@@ -20,13 +23,12 @@ class Settings(BaseSettings):
     APP_NAME: str = "EduAgent AI"
     APP_VERSION: str = "0.1.0"
 
-    #Lendo as variaveis de ambiente do arquivo .env
+    # Carregamento das variáveis de ambiente
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        extra="ignore"
-    
+        extra="ignore",
     )
 
-# Essa vai ser a instancia utilizada em toda a aplicação
+
 settings = Settings()
