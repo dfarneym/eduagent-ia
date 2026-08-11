@@ -1,7 +1,5 @@
 """Serviço responsável pelo pipeline RAG."""
 
-"""Serviço responsável pelo pipeline RAG."""
-
 from eduagent.services.ingest_service import IngestService
 from eduagent.services.llm_service import LLMService
 
