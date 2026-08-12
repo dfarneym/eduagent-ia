@@ -18,38 +18,52 @@ def render_sidebar() -> None:
 
     with st.sidebar:
 
-        st.title("🎓 EduAgent AI")
+        st.markdown(
+            """
+            <div style="
+                font-size: 1.45rem;
+                font-weight: 700;
+                margin-bottom: 0.25rem;
+            ">
+                🎓 EduAgent AI
+            </div>
+
+            <div style="
+                font-size: 0.85rem;
+                opacity: 0.7;
+                margin-bottom: 1rem;
+            ">
+                Assistente educacional inteligente
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         st.divider()
 
-        st.subheader("📄 Documentos")
-
-        if "rag_initialized" not in st.session_state:
-            st.session_state.rag_initialized = False
-
-        if "document_name" not in st.session_state:
-            st.session_state.document_name = "Nenhum"
+        st.subheader("📄 Documento")
 
         uploaded_file = st.file_uploader(
-            "Carregar documento PDF",
+            "Selecione um arquivo PDF",
             type=["pdf"],
+            help="Envie um documento para que o EduAgent possa consultá-lo.",
         )
 
         if uploaded_file is not None:
 
+            st.caption(
+                f"Arquivo selecionado: **{uploaded_file.name}**"
+            )
+
             if st.button(
                 "📥 Indexar documento",
                 use_container_width=True,
-            ):
-
+                ):
                 with st.spinner(
                     "Carregando e indexando documento..."
                 ):
 
                     try:
-                        # O arquivo enviado é armazenado apenas
-                        # temporariamente. O fixture de testes
-                        # versionado no Git não é alterado.
                         with tempfile.TemporaryDirectory() as temp_dir:
 
                             file_path = (
@@ -66,18 +80,22 @@ def render_sidebar() -> None:
                             )
 
                         st.session_state.rag_initialized = True
-
                         st.session_state.document_name = (
                             uploaded_file.name
                         )
 
-                        # Limpa o histórico quando um novo
-                        # documento é indexado.
+                        # O agente anterior pode ter sido criado
+                        # com o estado anterior da aplicação.
+                        st.session_state.agent = None
+
+                        # Um novo documento começa uma nova conversa.
                         st.session_state.messages = []
 
                         st.success(
                             "Documento indexado com sucesso!"
                         )
+
+                        st.rerun()
 
                     except Exception as error:
 
@@ -87,41 +105,32 @@ def render_sidebar() -> None:
 
         st.divider()
 
-        st.subheader("ℹ️ Informações")
+        st.subheader("📊 Status")
+
+        if st.session_state.rag_initialized:
+            st.success("RAG ativo")
+        else:
+            st.info("Aguardando documento")
 
         st.metric(
             label="Modelo",
             value=settings.MODEL_NAME,
         )
 
-        status = (
-            "🟢 Online"
-            if st.session_state.rag_initialized
-            else "🟡 Aguardando documento"
-        )
-
-        st.metric(
-            label="Status",
-            value=status,
-        )
-
         document_name = st.session_state.document_name
-
-        st.metric(
-            label="Documento",
-            value=(
-                "Carregado"
-                if document_name != "Nenhum"
-                else "Nenhum"
-            ),
-        )
 
         if document_name != "Nenhum":
             st.caption(
-                f"📄 {document_name}"
+                f"📄 Documento ativo: **{document_name}**"
+            )
+        else:
+            st.caption(
+                "📄 Nenhum documento carregado."
             )
 
         st.divider()
+
+        st.subheader("⚙️ Controles")
 
         if st.button(
             "🗑️ Limpar conversa",
@@ -129,3 +138,9 @@ def render_sidebar() -> None:
         ):
             st.session_state.messages = []
             st.rerun()
+
+        st.divider()
+
+        st.caption(
+            "EduAgent AI · RAG + ReAct"
+        )
