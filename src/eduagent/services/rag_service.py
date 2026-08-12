@@ -15,47 +15,32 @@ class RAGService:
     ):
         self.ingest_service = ingest_service or IngestService()
         self.llm_service = llm_service or LLMService()
-
         self.score_threshold = score_threshold
 
     def index(self, path: str):
-        """
-        Carrega, divide e indexa um documento.
-
-        Retorna os chunks gerados durante a ingestão.
-        """
-
-        chunks = self.ingest_service.ingest(path)
-
-        return chunks
+        """Carrega, divide e indexa um documento."""
+        return self.ingest_service.ingest(path)
 
     def retrieve(
         self,
         question: str,
         k: int = 4,
     ):
-        """
-        Recupera documentos relevantes utilizando similaridade
-        e aplica o filtro de score.
-        """
+        """Recupera documentos relevantes utilizando similaridade."""
 
         if self.ingest_service.vectorstore.vectorstore is None:
-            raise ValueError(
-                "Nenhum documento foi indexado."
-            )
+            raise ValueError("Nenhum documento foi indexado.")
 
         results = self.ingest_service.vectorstore.search_with_score(
             question,
             k=k,
         )
 
-        relevant_documents = [
+        return [
             document
             for document, score in results
             if score <= self.score_threshold
         ]
-
-        return relevant_documents
 
     def ask(
         self,
@@ -63,10 +48,7 @@ class RAGService:
         k: int = 4,
     ):
         """
-        Executa um pipeline RAG tradicional.
-
-        Recupera os documentos relevantes e utiliza o LLM
-        para gerar uma resposta baseada exclusivamente no contexto.
+        Executa o pipeline RAG e retorna a resposta com as fontes.
         """
 
         documents = self.retrieve(
@@ -80,10 +62,14 @@ class RAGService:
                 "nos documentos disponíveis."
             )
 
-        context = "\n\n".join(
-            document.page_content
-            for document in documents
-        )
+        context_parts = []
+
+        for document in documents:
+            context_parts.append(
+                document.page_content
+            )
+
+        context = "\n\n".join(context_parts)
 
         prompt = f"""
 Você é o EduAgent AI, um assistente educacional.
@@ -108,4 +94,40 @@ Responda em português de forma clara e objetiva.
 
         response = self.llm_service.invoke(prompt)
 
+        sources = self._format_sources(documents)
+
+        if sources:
+            return (
+                f"{response.content}\n\n"
+                f"---\n\n"
+                f"**📚 Fontes consultadas**\n\n"
+                f"{sources}"
+            )
+
         return response.content
+
+    @staticmethod
+    def _format_sources(documents) -> str:
+        """Formata os metadados dos documentos recuperados."""
+
+        sources = []
+        seen = set()
+
+        for document in documents:
+            metadata = document.metadata or {}
+
+            source = metadata.get("source", "Documento")
+            page = metadata.get("page")
+
+            source_name = str(source).replace("\\", "/").split("/")[-1]
+
+            if page is not None:
+                label = f"`{source_name}` — página {page + 1}"
+            else:
+                label = f"`{source_name}`"
+
+            if label not in seen:
+                seen.add(label)
+                sources.append(f"- {label}")
+
+        return "\n".join(sources)

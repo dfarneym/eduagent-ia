@@ -48,12 +48,39 @@ def search_documents(query: str) -> str:
             "nos documentos disponíveis."
         )
 
-    context = "\n\n".join(
-        document.page_content
-        for document in documents
-    )
+    results = []
+
+    for document in documents:
+        metadata = document.metadata or {}
+
+        source = metadata.get(
+            "source",
+            "Documento",
+        )
+
+        page = metadata.get("page")
+
+        source_name = (
+            str(source)
+            .replace("\\", "/")
+            .split("/")[-1]
+        )
+
+        if page is not None:
+            source_label = (
+                f"{source_name} — página {page + 1}"
+            )
+        else:
+            source_label = source_name
+
+        results.append(
+            "Fonte: "
+            f"{source_label}\n"
+            "Conteúdo:\n"
+            f"{document.page_content}"
+        )
 
     return (
         "Informações encontradas nos documentos:\n\n"
-        f"{context}"
+        + "\n\n---\n\n".join(results)
     )

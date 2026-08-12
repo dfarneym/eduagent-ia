@@ -7,55 +7,51 @@ from langgraph.prebuilt import create_react_agent
 from eduagent.services.llm_service import LLMService
 from eduagent.tools.rag_tool import search_documents
 
+
 class AgentService:
     """Coordena o agente ReAct do EduAgent AI."""
 
-   
     SYSTEM_PROMPT = """
-        
-        Você é o EduAgent AI, um assistente educacional baseado em documentos.
+Você é o EduAgent AI, um assistente educacional baseado em documentos.
 
-        REGRAS OBRIGATÓRIAS:
+REGRAS OBRIGATÓRIAS:
 
-        1. Para responder perguntas relacionadas aos documentos, SEMPRE utilize
-        a ferramenta `search_documents`.
+1. Para responder perguntas relacionadas aos documentos, SEMPRE utilize
+a ferramenta `search_documents`.
 
-        2. Você deve responder EXCLUSIVAMENTE com informações encontradas
-        nos documentos fornecidos pela ferramenta.
+2. Responda EXCLUSIVAMENTE com informações encontradas nos documentos
+fornecidos pela ferramenta.
 
-        3. NÃO utilize conhecimento próprio, conhecimento geral ou informações
-        externas aos documentos.
+3. NÃO utilize conhecimento próprio, conhecimento geral ou informações
+externas aos documentos.
 
-        4. Se a ferramenta não encontrar informações relevantes para a pergunta,
-        responda claramente que a informação não foi encontrada nos documentos
-        disponíveis.
+4. Se a ferramenta não encontrar informações relevantes para a pergunta,
+responda claramente que a informação não foi encontrada nos documentos
+disponíveis.
 
-        5. Nunca invente, complete ou suponha informações que não estejam nos
-        documentos.
+5. Nunca invente, complete ou suponha informações que não estejam nos
+documentos.
 
-        6. Responda sempre em português.
+6. Responda sempre em português.
 
-        7. Seja claro, objetivo e didático.
+7. Seja claro, objetivo e didático.
 
-        8. Quando a pergunta não puder ser respondida com os documentos,
-        não tente responder utilizando conhecimento geral.
+8. Quando a pergunta não puder ser respondida com os documentos,
+não tente responder utilizando conhecimento geral.
 
-        EXEMPLO:
+9. Quando a ferramenta fornecer uma fonte, preserve essa informação
+na resposta final.
 
-        Pergunta:
-        "Qual é a capital da França?"
+10. Não invente páginas, nomes de arquivos ou fontes.
 
-        Se os documentos não contiverem essa informação, NÃO responda:
-        "Paris."
+Quando a ferramenta retornar informações relevantes, utilize SOMENTE
+essas informações para construir a resposta final.
+"""
 
-        Responda:
-        "Não encontrei informações sobre a capital da França nos documentos disponíveis."
-
-        Quando a ferramenta retornar informações relevantes, utilize SOMENTE essas
-        informações para construir a resposta final.
-        """
-   
-    def __init__(self, llm_service: LLMService | None = None):
+    def __init__(
+        self,
+        llm_service: LLMService | None = None,
+    ):
         self.llm_service = llm_service or LLMService()
 
         self.agent = create_react_agent(
@@ -64,7 +60,10 @@ class AgentService:
             prompt=self.SYSTEM_PROMPT,
         )
 
-    def invoke(self, input_data: str | dict[str, Any]):
+    def invoke(
+        self,
+        input_data: str | dict[str, Any],
+    ):
         """
         Executa o agente.
 
@@ -72,8 +71,7 @@ class AgentService:
         - uma pergunta como string;
         - um estado LangGraph no formato {"messages": [...]}.
 
-        Retorna:
-            dict contendo o estado final do agente.
+        Retorna o estado final do agente.
         """
 
         if isinstance(input_data, str):
@@ -107,6 +105,25 @@ class AgentService:
         Faz uma pergunta ao agente e retorna somente a resposta final.
         """
 
+        result = self.ask_with_sources(question)
+
+        return result["answer"]
+
+    def ask_with_sources(
+        self,
+        question: str,
+    ) -> dict[str, Any]:
+        """
+        Faz uma pergunta ao agente e retorna a resposta juntamente
+        com as fontes encontradas durante a busca.
+
+        Retorna:
+            {
+                "answer": str,
+                "sources": list[dict]
+            }
+        """
+
         if not isinstance(question, str):
             raise TypeError(
                 "A pergunta deve ser uma string."
@@ -124,14 +141,116 @@ class AgentService:
         messages = response.get("messages", [])
 
         if not messages:
-            return "O agente não retornou nenhuma mensagem."
+            return {
+                "answer": "O agente não retornou nenhuma mensagem.",
+                "sources": [],
+            }
 
-        # Procura a última mensagem com conteúdo textual.
+        answer = ""
+
         for message in reversed(messages):
-            content = getattr(message, "content", None)
+            content = getattr(
+                message,
+                "content",
+                None,
+            )
 
             if isinstance(content, str) and content.strip():
-                return content.strip()
+                answer = content.strip()
+                break
 
-        return "O agente não retornou uma resposta válida."
+        if not answer:
+            answer = "O agente não retornou uma resposta válida."
 
+        sources = self._extract_sources(messages)
+
+        return {
+            "answer": answer,
+            "sources": sources,
+        }
+
+    @staticmethod
+    def _extract_sources(messages: list[Any]) -> list[dict[str, Any]]:
+        """
+        Extrai fontes das mensagens retornadas pela ferramenta RAG.
+        """
+
+        sources = []
+        seen = set()
+
+        for message in messages:
+            content = getattr(
+                message,
+                "content",
+                None,
+            )
+
+            if not isinstance(content, str):
+                continue
+
+            if "Fonte:" not in content:
+                continue
+
+            blocks = content.split("---")
+
+            for block in blocks:
+                lines = [
+                    line.strip()
+                    for line in block.splitlines()
+                    if line.strip()
+                ]
+
+                source_line = next(
+                    (
+                        line
+                        for line in lines
+                        if line.startswith("Fonte:")
+                    ),
+                    None,
+                )
+
+                if not source_line:
+                    continue
+
+                source_text = source_line.replace(
+                    "Fonte:",
+                    "",
+                    1,
+                ).strip()
+
+                if not source_text:
+                    continue
+
+                page = None
+
+                if " — página " in source_text:
+                    source_name, page_text = source_text.rsplit(
+                        " — página ",
+                        1,
+                    )
+
+                    try:
+                        page = int(page_text)
+                    except ValueError:
+                        page = None
+                else:
+                    source_name = source_text
+
+                key = (
+                    source_name,
+                    page,
+                )
+
+                if key in seen:
+                    continue
+
+                seen.add(key)
+
+                sources.append(
+                    {
+                        "name": source_name,
+                        "page": page,
+                    }
+                )
+
+        return sources
