@@ -1,49 +1,129 @@
-"""Interface principal de conversação do EduAgent AI."""
+"""
+Interface principal de conversação do EduAgent AI.
+"""
 
 import streamlit as st
 
 from eduagent.services.agent_service import AgentService
 
 
+def _render_sources(sources: list[dict]) -> None:
+    """Renderiza as fontes consultadas pela resposta."""
+
+    if not sources:
+        return
+
+    with st.expander("📚 Fontes consultadas"):
+        for source in sources:
+            name = source.get(
+                "name",
+                "Documento",
+            )
+
+            page = source.get("page")
+
+            if page is not None:
+                st.markdown(
+                    f"📄 **{name}** · página {page}"
+                )
+            else:
+                st.markdown(
+                    f"📄 **{name}**"
+                )
+
+
+def _render_welcome() -> None:
+    """Renderiza o estado inicial do chat."""
+
+    if st.session_state.get("rag_initialized", False):
+        document_name = st.session_state.get(
+            "document_name",
+            "Documento",
+        )
+
+        st.markdown(
+            "### 💬 Assistente Educacional"
+        )
+
+        st.caption(
+            f"Faça perguntas sobre **{document_name}**."
+        )
+
+        st.markdown(
+            """
+            **Sugestões de perguntas:**
+
+            - Qual é o objetivo deste documento?
+            - Quais são os principais pontos apresentados?
+            - Explique um conceito encontrado no texto.
+            """
+        )
+
+    else:
+        st.markdown(
+            "### 💬 Assistente Educacional"
+        )
+
+        st.info(
+            "📄 Carregue e indexe um documento PDF "
+            "na barra lateral para começar."
+        )
+
+
 def render_chat() -> None:
     """Renderiza o histórico e a entrada do chat."""
 
-    # Histórico da conversa
+    # ---------------------------------------------------------
+    # Estado inicial
+    # ---------------------------------------------------------
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Histórico das mensagens
+    # ---------------------------------------------------------
+    # Cabeçalho / estado inicial
+    # ---------------------------------------------------------
+
+    if not st.session_state.messages:
+        _render_welcome()
+
+    # ---------------------------------------------------------
+    # Histórico da conversa
+    # ---------------------------------------------------------
+
     for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
 
-            # Mostra as fontes somente nas respostas do assistente
-            if message["role"] == "assistant":
-                sources = message.get("sources", [])
+        role = message["role"]
 
-                if sources:
-                    with st.expander("📚 Fontes consultadas"):
-                        for source in sources:
-                            name = source.get("name", "Documento")
-                            page = source.get("page")
+        with st.chat_message(role):
 
-                            if page is not None:
-                                st.markdown(
-                                    f"📄 **{name}** — página {page}"
-                                )
-                            else:
-                                st.markdown(
-                                    f"📄 **{name}**"
-                                )
+            st.markdown(
+                message["content"]
+            )
+
+            if role == "assistant":
+                sources = message.get(
+                    "sources",
+                    [],
+                )
+
+                _render_sources(sources)
+
+    # ---------------------------------------------------------
+    # Entrada do usuário
+    # ---------------------------------------------------------
 
     question = st.chat_input(
-        "Digite sua pergunta sobre os documentos..."
+        "Faça uma pergunta sobre o documento..."
     )
 
     if not question:
         return
 
-    # Mostra a pergunta do usuário
+    # ---------------------------------------------------------
+    # Mensagem do usuário
+    # ---------------------------------------------------------
+
     st.session_state.messages.append(
         {
             "role": "user",
@@ -54,32 +134,45 @@ def render_chat() -> None:
     with st.chat_message("user"):
         st.markdown(question)
 
+    # ---------------------------------------------------------
     # Verifica se existe documento indexado
+    # ---------------------------------------------------------
+
     if not st.session_state.get(
         "rag_initialized",
         False,
     ):
+
         response = (
-            "Nenhum documento foi carregado ainda. "
-            "Utilize a barra lateral para carregar um documento PDF."
+            "📄 Nenhum documento foi carregado ainda.\n\n"
+            "Utilize a barra lateral para carregar e "
+            "indexar um arquivo PDF."
         )
+
+        sources = []
+
+        with st.chat_message("assistant"):
+            st.markdown(response)
 
         st.session_state.messages.append(
             {
                 "role": "assistant",
                 "content": response,
-                "sources": [],
+                "sources": sources,
             }
         )
 
-        with st.chat_message("assistant"):
-            st.markdown(response)
-
         return
 
+    # ---------------------------------------------------------
     # Executa o agente
+    # ---------------------------------------------------------
+
     with st.chat_message("assistant"):
-        with st.spinner("Analisando os documentos..."):
+
+        with st.spinner(
+            "Analisando o documento..."
+        ):
 
             try:
                 agent = AgentService()
@@ -88,43 +181,33 @@ def render_chat() -> None:
                     question
                 )
 
-                response = result["answer"]
+                response = result.get(
+                    "answer",
+                    "O agente não retornou uma resposta.",
+                )
+
                 sources = result.get(
                     "sources",
                     [],
                 )
 
             except Exception as error:
+
                 response = (
-                    "Ocorreu um erro ao processar sua pergunta.\n\n"
+                    "Não foi possível processar sua pergunta.\n\n"
                     f"Detalhes: `{error}`"
                 )
 
                 sources = []
 
-            st.markdown(response)
+        st.markdown(response)
 
-            # Fontes da resposta atual
-            if sources:
-                with st.expander("📚 Fontes consultadas"):
-                    for source in sources:
-                        name = source.get(
-                            "name",
-                            "Documento",
-                        )
+        _render_sources(sources)
 
-                        page = source.get("page")
+    # ---------------------------------------------------------
+    # Salva resposta no histórico
+    # ---------------------------------------------------------
 
-                        if page is not None:
-                            st.markdown(
-                                f"📄 **{name}** — página {page}"
-                            )
-                        else:
-                            st.markdown(
-                                f"📄 **{name}**"
-                            )
-
-    # Salva resposta e fontes no histórico
     st.session_state.messages.append(
         {
             "role": "assistant",
