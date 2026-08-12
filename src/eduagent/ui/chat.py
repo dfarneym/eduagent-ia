@@ -36,6 +36,7 @@ def _render_welcome() -> None:
     """Renderiza o estado inicial do chat."""
 
     if st.session_state.get("rag_initialized", False):
+
         document_name = st.session_state.get(
             "document_name",
             "Documento",
@@ -50,16 +51,31 @@ def _render_welcome() -> None:
         )
 
         st.markdown(
-            """
-            **Sugestões de perguntas:**
-
-            - Qual é o objetivo deste documento?
-            - Quais são os principais pontos apresentados?
-            - Explique um conceito encontrado no texto.
-            """
+            "**Sugestões de perguntas:**"
         )
 
+        suggestions = [
+            "Qual é o objetivo deste documento?",
+            "Quais são os principais pontos apresentados?",
+            "Explique um conceito encontrado no texto.",
+        ]
+
+        cols = st.columns(3)
+
+        for index, suggestion in enumerate(suggestions):
+
+            with cols[index]:
+
+                if st.button(
+                    suggestion,
+                    use_container_width=True,
+                    key=f"suggestion_{index}",
+                ):
+                    st.session_state.suggested_question = suggestion
+                    st.rerun()
+
     else:
+
         st.markdown(
             "### 💬 Assistente Educacional"
         )
@@ -79,6 +95,9 @@ def render_chat() -> None:
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
+
+    if "suggested_question" not in st.session_state:
+        st.session_state.suggested_question = None
 
     # ---------------------------------------------------------
     # Cabeçalho / estado inicial
@@ -102,6 +121,7 @@ def render_chat() -> None:
             )
 
             if role == "assistant":
+
                 sources = message.get(
                     "sources",
                     [],
@@ -117,8 +137,17 @@ def render_chat() -> None:
         "Faça uma pergunta sobre o documento..."
     )
 
+    # Verifica se o usuário clicou em uma sugestão
+    if not question:
+        question = st.session_state.get(
+            "suggested_question"
+        )
+
     if not question:
         return
+
+    # Limpa a sugestão depois de utilizá-la
+    st.session_state.suggested_question = None
 
     # ---------------------------------------------------------
     # Mensagem do usuário
@@ -142,26 +171,6 @@ def render_chat() -> None:
         "rag_initialized",
         False,
     ):
-
-        response = (
-            "📄 Nenhum documento foi carregado ainda.\n\n"
-            "Utilize a barra lateral para carregar e "
-            "indexar um arquivo PDF."
-        )
-
-        sources = []
-
-        with st.chat_message("assistant"):
-            st.markdown(response)
-
-        st.session_state.messages.append(
-            {
-                "role": "assistant",
-                "content": response,
-                "sources": sources,
-            }
-        )
-
         return
 
     # ---------------------------------------------------------

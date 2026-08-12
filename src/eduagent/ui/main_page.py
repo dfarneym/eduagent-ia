@@ -16,79 +16,126 @@ def inject_styles() -> None:
 
     st.markdown(
         """
-        <style>
-        /* Área principal */
-        .block-container {
-            max-width: 1200px;
-            padding-top: 2rem;
-            padding-bottom: 3rem;
-        }
+<style>
 
-        /* Cabeçalho */
-        .hero {
-            padding: 1.5rem 0 1rem 0;
-        }
+.block-container {
+    max-width: 1200px;
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+}
 
-        .hero-title {
-            font-size: 2.4rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
+/* =====================================================
+   Cabeçalho
+===================================================== */
 
-        .hero-subtitle {
-            font-size: 1.05rem;
-            opacity: 0.75;
-            margin-bottom: 1.5rem;
-        }
+.hero {
+    padding: 0.5rem 0 1rem 0;
+}
 
-        /* Cards */
-        .info-card {
-            padding: 1.2rem;
-            border: 1px solid rgba(128, 128, 128, 0.25);
-            border-radius: 14px;
-            margin-bottom: 1rem;
-        }
+.hero-title {
+    font-size: 2.15rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.2rem;
+}
 
-        .info-card-title {
-            font-weight: 650;
-            font-size: 1rem;
-            margin-bottom: 0.4rem;
-        }
+.hero-subtitle {
+    font-size: 0.98rem;
+    opacity: 0.65;
+    margin-bottom: 0.8rem;
+}
 
-        .info-card-text {
-            opacity: 0.75;
-            font-size: 0.92rem;
-        }
+/* =====================================================
+   Documento ativo
+===================================================== */
 
-        /* Sidebar */
-        section[data-testid="stSidebar"] {
-            border-right: 1px solid rgba(128, 128, 128, 0.2);
-        }
+.document-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid rgba(128, 128, 128, 0.22);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    line-height: 1.2;
+    opacity: 0.85;
+}
 
-        section[data-testid="stSidebar"] .block-container {
-            padding-top: 1.5rem;
-        }
+/* =====================================================
+   Card inicial
+===================================================== */
 
-        /* Chat */
-        [data-testid="stChatMessage"] {
-            border-radius: 14px;
-            margin-bottom: 0.75rem;
-        }
+.welcome-card {
+    padding: 1.1rem 1.2rem;
+    border: 1px solid rgba(128, 128, 128, 0.22);
+    border-radius: 14px;
+    margin: 0.5rem 0 1.25rem 0;
+}
 
-        /* Input */
-        [data-testid="stChatInput"] {
-            margin-top: 1rem;
-        }
+.welcome-title {
+    font-weight: 650;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+}
 
-        /* Esconde elementos desnecessários */
-        #MainMenu {
-            visibility: hidden;
-        }
+.welcome-text {
+    opacity: 0.75;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
 
-        footer {
-            visibility: hidden;
-        }
-        </style>
+/* =====================================================
+   Chat
+===================================================== */
+
+[data-testid="stChatMessage"] {
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+}
+
+[data-testid="stChatInput"] {
+    margin-top: 1rem;
+}
+
+/* =====================================================
+       Sugestões de perguntas
+===================================================== */
+
+[data-testid="stHorizontalBlock"] .stButton > button {
+        min-height: 3.2rem;
+        height: 3.2rem;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.82rem;
+        line-height: 1.25;
+        border-radius: 10px;
+        white-space: normal;
+}
+
+/* =====================================================
+   Sidebar
+===================================================== */
+
+section[data-testid="stSidebar"] {
+    border-right: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+section[data-testid="stSidebar"] .block-container {
+    padding-top: 1.5rem;
+}
+
+/* =====================================================
+   Interface Streamlit
+===================================================== */
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+</style>
         """,
         unsafe_allow_html=True,
     )
@@ -124,48 +171,60 @@ def run_app() -> None:
 
     render_sidebar()
 
+    # =========================================================
+    # Cabeçalho principal
+    # =========================================================
+
     st.markdown(
         """
-        <div class="hero">
-            <div class="hero-title">🎓 EduAgent AI</div>
-            <div class="hero-subtitle">
-                Plataforma inteligente para instituições de ensino
-            </div>
-        </div>
+<div class="hero">
+    <div class="hero-title">🎓 EduAgent AI</div>
+    <div class="hero-subtitle">Assistente educacional inteligente</div>
+</div>
         """,
         unsafe_allow_html=True,
     )
 
+    # =========================================================
+    # Status do documento
+    # =========================================================
+
     if not st.session_state.rag_initialized:
         st.markdown(
             """
-            <div class="info-card">
-                <div class="info-card-title">
-                    👋 Bem-vindo ao EduAgent AI
-                </div>
-                <div class="info-card-text">
-                    Carregue um documento PDF na barra lateral para
-                    começar a fazer perguntas sobre o conteúdo.
-                    O sistema utiliza RAG para recuperar informações
-                    diretamente dos documentos fornecidos.
-                </div>
-            </div>
+<div class="welcome-card">
+    <div class="welcome-title">
+        👋 Bem-vindo ao EduAgent AI
+    </div>
+    <div class="welcome-text">
+        Carregue e indexe um documento PDF na
+        barra lateral para começar a fazer
+        perguntas sobre o conteúdo.
+    </div>
+</div>
             """,
             unsafe_allow_html=True,
         )
+
     else:
+        document_name = st.session_state.document_name
+
         st.markdown(
             f"""
-            <div class="info-card">
-                <div class="info-card-title">
-                    📄 Documento ativo
-                </div>
-                <div class="info-card-text">
-                    {st.session_state.document_name}
-                </div>
-            </div>
+<div class="welcome-card">
+    <div class="welcome-title">
+        📄 Documento ativo
+    </div>
+    <div class="welcome-text">
+        {document_name}
+    </div>
+</div>
             """,
             unsafe_allow_html=True,
         )
+
+    # =========================================================
+    # Chat
+    # =========================================================
 
     render_chat()
