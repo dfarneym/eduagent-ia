@@ -1,4 +1,4 @@
-# Responsável por coordenar o processo de ingestão de documentos.
+"""Serviço responsável pela ingestão de documentos."""
 
 from eduagent.loaders import PDFLoader
 from eduagent.splitters.text_splitter import TextSplitter
@@ -19,14 +19,20 @@ class IngestService:
         self.loader = loader or PDFLoader()
         self.splitter = splitter or TextSplitter()
         self.embeddings = embeddings or Embeddings()
+
         self.vectorstore = vectorstore or FAISSStore(
             self.embeddings.model
         )
 
     def ingest(self, path: str):
-        """Carrega o documento e cria o índice vetorial."""
+        """
+        Carrega, divide e indexa um documento.
+
+        O vectorstore é criado apenas uma vez neste ponto.
+        """
 
         documents = self.loader.load(path)
+
         chunks = self.splitter.split(documents)
 
         self.vectorstore.create(chunks)

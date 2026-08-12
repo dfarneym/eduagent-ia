@@ -16,17 +16,16 @@ class RAGService:
         self.ingest_service = ingest_service or IngestService()
         self.llm_service = llm_service or LLMService()
 
-        self.vectorstore = None
         self.score_threshold = score_threshold
 
     def index(self, path: str):
-        """Carrega, divide e indexa um documento."""
+        """
+        Carrega, divide e indexa um documento.
+
+        Retorna os chunks gerados durante a ingestão.
+        """
 
         chunks = self.ingest_service.ingest(path)
-
-        self.vectorstore = self.ingest_service.vectorstore.create(
-            chunks
-        )
 
         return chunks
 
@@ -35,9 +34,12 @@ class RAGService:
         question: str,
         k: int = 4,
     ):
-        """Recupera documentos relevantes."""
+        """
+        Recupera documentos relevantes utilizando similaridade
+        e aplica o filtro de score.
+        """
 
-        if self.vectorstore is None:
+        if self.ingest_service.vectorstore.vectorstore is None:
             raise ValueError(
                 "Nenhum documento foi indexado."
             )
@@ -60,7 +62,12 @@ class RAGService:
         question: str,
         k: int = 4,
     ):
-        """Recupera contexto relevante e gera uma resposta."""
+        """
+        Executa um pipeline RAG tradicional.
+
+        Recupera os documentos relevantes e utiliza o LLM
+        para gerar uma resposta baseada exclusivamente no contexto.
+        """
 
         documents = self.retrieve(
             question,
