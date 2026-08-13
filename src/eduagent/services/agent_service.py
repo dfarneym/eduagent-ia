@@ -44,6 +44,13 @@ na resposta final.
 
 10. Não invente páginas, nomes de arquivos ou fontes.
 
+11. O histórico da conversa serve apenas para compreender o contexto
+da pergunta atual. Para obter informações sobre o documento, faça uma
+nova busca usando `search_documents`.
+
+12. Nunca reutilize ou invente resultados de ferramentas de mensagens
+anteriores.
+
 Quando a ferramenta retornar informações relevantes, utilize SOMENTE
 essas informações para construir a resposta final.
 """
@@ -112,10 +119,14 @@ essas informações para construir a resposta final.
     def ask_with_sources(
         self,
         question: str,
+        conversation_history: list[dict[str, str]] | None = None,
     ) -> dict[str, Any]:
         """
         Faz uma pergunta ao agente e retorna a resposta juntamente
         com as fontes encontradas durante a busca.
+
+        O histórico é utilizado somente como contexto textual.
+        As mensagens internas de ferramentas não são reutilizadas.
 
         Retorna:
             {
@@ -136,11 +147,86 @@ essas informações para construir a resposta final.
                 "A pergunta não pode estar vazia."
             )
 
-        response = self.invoke(question)
+        messages = []
 
-        messages = response.get("messages", [])
+        # ---------------------------------------------------------
+        # Histórico textual da conversa
+        # ---------------------------------------------------------
 
-        if not messages:
+        if conversation_history:
+
+            history_lines = []
+
+            for message in conversation_history:
+
+                role = message.get("role")
+                content = message.get("content", "")
+
+                if role not in {"user", "assistant"}:
+                    continue
+
+                if not isinstance(content, str):
+                    continue
+
+                content = content.strip()
+
+                if not content:
+                    continue
+
+                # Evita colocar detalhes técnicos ou fontes completas
+                # novamente no contexto do agente.
+                history_lines.append(
+                    f"{'Usuário' if role == 'user' else 'Assistente'}: "
+                    f"{content}"
+                )
+
+            if history_lines:
+
+                history_text = "\n".join(history_lines)
+
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": (
+                            "Contexto da conversa anterior:\n\n"
+                            f"{history_text}\n\n"
+                            "Agora responda à nova pergunta abaixo. "
+                            "Use o histórico somente para compreender "
+                            "o contexto. Para informações do documento, "
+                            "faça uma nova busca em `search_documents`.\n\n"
+                            f"Nova pergunta: {question}"
+                        ),
+                    }
+                )
+
+            else:
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": question,
+                    }
+                )
+
+        else:
+            messages.append(
+                {
+                    "role": "user",
+                    "content": question,
+                }
+            )
+
+        response = self.invoke(
+            {
+                "messages": messages,
+            }
+        )
+
+        response_messages = response.get(
+            "messages",
+            [],
+        )
+
+        if not response_messages:
             return {
                 "answer": "O agente não retornou nenhuma mensagem.",
                 "sources": [],
@@ -148,29 +234,67 @@ essas informações para construir a resposta final.
 
         answer = ""
 
-        for message in reversed(messages):
+        # Procura a resposta final do agente.
+        # Mensagens da ferramenta RAG não devem ser exibidas diretamente.
+        for message in reversed(response_messages):
+
+            message_type = getattr(
+                message,
+                "type",
+                None,
+            )
+
+            if message_type != "ai":
+                continue
+
             content = getattr(
                 message,
                 "content",
                 None,
             )
 
-            if isinstance(content, str) and content.strip():
-                answer = content.strip()
+            if not isinstance(content, str):
+                continue
+
+            content = content.strip()
+
+            if not content:
+                continue
+
+            # Remove linhas de fonte caso o modelo tenha repetido a fonte
+            # na resposta final.
+            lines = content.splitlines()
+
+            cleaned_lines = [
+                line
+                for line in lines
+                if not line.strip().lower().startswith("fonte:")
+            ]
+
+            cleaned_content = "\n".join(
+                cleaned_lines
+            ).strip()
+
+            if cleaned_content:
+                answer = cleaned_content
                 break
 
         if not answer:
-            answer = "O agente não retornou uma resposta válida."
-
-        sources = self._extract_sources(messages)
-
+            answer = (
+                "O agente não retornou uma resposta válida."
+            )
+        sources = self._extract_sources(
+            response_messages
+        )
         return {
             "answer": answer,
             "sources": sources,
         }
 
     @staticmethod
-    def _extract_sources(messages: list[Any]) -> list[dict[str, Any]]:
+    def _extract_sources(
+        messages: list[Any],
+    ) -> list[dict[str, Any]]:
         """
         Extrai fontes das mensagens retornadas pela ferramenta RAG.
         """
@@ -179,6 +303,7 @@ essas informações para construir a resposta final.
         seen = set()
 
         for message in messages:
+
             content = getattr(
                 message,
                 "content",
@@ -194,6 +319,7 @@ essas informações para construir a resposta final.
             blocks = content.split("---")
 
             for block in blocks:
+
                 lines = [
                     line.strip()
                     for line in block.splitlines()
@@ -224,6 +350,7 @@ essas informações para construir a resposta final.
                 page = None
 
                 if " — página " in source_text:
+
                     source_name, page_text = source_text.rsplit(
                         " — página ",
                         1,
@@ -231,8 +358,10 @@ essas informações para construir a resposta final.
 
                     try:
                         page = int(page_text)
+
                     except ValueError:
                         page = None
+
                 else:
                     source_name = source_text
 
@@ -254,3 +383,4 @@ essas informações para construir a resposta final.
                 )
 
         return sources
+

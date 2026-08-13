@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # LLM
     GROQ_API_KEY: str = ""
-    MODEL_NAME: str = "llama-3.3-70b-versatile"
+    MODEL_NAME: str = "qwen/qwen3.6-27b"
 
     # Diretórios
     DOCUMENTS_PATH: str = "data/documents"

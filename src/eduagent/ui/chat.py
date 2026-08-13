@@ -150,6 +150,12 @@ def render_chat() -> None:
     st.session_state.suggested_question = None
 
     # ---------------------------------------------------------
+    # Histórico anterior à pergunta atual
+    # ---------------------------------------------------------
+
+    conversation_history = st.session_state.messages.copy()
+
+    # ---------------------------------------------------------
     # Mensagem do usuário
     # ---------------------------------------------------------
 
@@ -184,10 +190,12 @@ def render_chat() -> None:
         ):
 
             try:
+                
                 agent = AgentService()
 
                 result = agent.ask_with_sources(
-                    question
+                    question,
+                    conversation_history=conversation_history,
                 )
 
                 response = result.get(
