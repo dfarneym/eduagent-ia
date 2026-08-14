@@ -400,36 +400,104 @@ Esses valores ficam centralizados nas configurações da aplicação e podem ser
 
 ✅ **Publicado**
 
-🔗 Aplicação online: `URL`
+A aplicação possui uma versão publicada no Streamlit Community Cloud para demonstração.
+
+🔗 Aplicação online: `https://eduagent-ia-dk7w4kiyu2zetyb5ixkstg.streamlit.app/`
 
 A aplicação está disponível para testes online.
 
+A configuração utiliza as variáveis de ambiente/secrets da plataforma para disponibilizar a chave da API da Groq sem versioná-la no repositório.
+
 ### Oracle Cloud Infrastructure (OCI)
 
-⏳ **Planejado**
+⏳ **Pendente**
 
-O deploy final será realizado na Oracle Cloud Infrastructure, atendendo ao requisito de utilização de pelo menos um serviço OCI no challenge.
+O deploy na Oracle Cloud Infrastructure (OCI) ainda não foi realizado.
 
-Após a publicação, esta seção será atualizada com:
+Esta etapa permanece como requisito pendente do Challenge e será documentada no README após sua conclusão, incluindo o serviço OCI utilizado e a evidência da aplicação em execução.
 
-- URL da aplicação;
-- serviço OCI utilizado;
-- instruções de execução;
-- evidência da aplicação rodando em nuvem.
 
 ---
 
 ## 📸 Demonstração
 
-> Esta seção será atualizada após a publicação online.
+## 📸 Demonstração
+
+### Interface principal
+
+🔗 Aplicação online: `https://eduagent-ia-dk7w4kiyu2zetyb5ixkstg.streamlit.app/`
+
+![Interface principal do EduAgent AI](assets/screenshots/interface-documento.png)
+
+**Figura 1 — Interface principal do EduAgent AI em execução no Streamlit Community Cloud.** A tela apresenta a seleção de um documento de demonstração, o documento ativo, uma pergunta realizada pelo usuário, a resposta gerada pelo agente e a seção de fontes consultadas.
+
+### Consulta contextual
+
+![Consulta contextual ao documento](assets/screenshots/consulta-contextual.png)
+
+**Figura 2 — Consulta contextual ao documento de demonstração.** A interface apresenta sugestões de perguntas relacionadas ao conteúdo do documento selecionado, permitindo ao usuário realizar consultas fundamentadas no conteúdo recuperado pelo RAG.
+
+### Upload e indexação
+
+![Upload e indexação de documento](assets/screenshots/upload-documento.png)
+
+**Figura 3 — Upload, validação e indexação de documento PDF próprio.** A interface apresenta o arquivo selecionado, seu tamanho e número de páginas, confirma que o documento está dentro dos limites permitidos e disponibiliza a indexação para consultas posteriores.
 
 ### Aplicação em execução
 
-_Adicionar aqui uma captura de tela da aplicação rodando na nuvem._
+## 🖥️ Funcionamento da interface
 
-### Link da aplicação
+A interface do EduAgent AI foi desenvolvida em **Streamlit** para tornar o teste do agente simples e direto.
 
-_Adicionar aqui a URL pública após o deploy._
+O usuário pode escolher entre duas formas de utilização:
+
+### 📚 Documentos de demonstração
+
+A aplicação disponibiliza documentos PDF prontos para teste. O usuário seleciona um documento na lista e o torna ativo para consulta.
+
+A interface apresenta **sugestões de perguntas contextualizadas**, geradas de acordo com o documento selecionado, facilitando a avaliação do agente.
+
+### 📤 Upload de documento próprio
+
+Também é possível enviar um PDF diretamente pela interface. Antes da indexação, a aplicação informa:
+
+* nome do arquivo;
+* tamanho;
+* quantidade de páginas;
+* se o documento está dentro dos limites permitidos.
+
+Após a validação, o usuário seleciona **Indexar documento**. O conteúdo é processado pelo pipeline RAG e o documento fica disponível para consultas.
+
+### 💬 Conversação
+
+Com um documento ativo, o usuário pode fazer perguntas em linguagem natural. O agente recupera os trechos relevantes por meio do RAG e gera a resposta com base no conteúdo recuperado.
+
+As **fontes consultadas** ficam disponíveis abaixo das respostas, permitindo verificar quais trechos do documento foram utilizados.
+
+A interface também mantém o **histórico da conversa**, possibilitando perguntas de acompanhamento que utilizam o contexto das interações anteriores.
+
+### 🔎 Fluxo resumido
+
+```text
+Selecionar documento
+        ↓
+       ou
+Enviar PDF próprio
+        ↓
+Validar arquivo
+        ↓
+Indexar documento
+        ↓
+Fazer pergunta
+        ↓
+Recuperar trechos relevantes
+        ↓
+Gerar resposta
+        ↓
+Exibir fontes consultadas
+```
+
+Dessa forma, a interface permite testar tanto o funcionamento do pipeline de ingestão e RAG quanto o comportamento conversacional do agente.
 
 ---
 
@@ -451,10 +519,10 @@ _Adicionar aqui a URL pública após o deploy._
 - [x] Limites de entrada
 - [x] Docker
 - [x] Execução do sistema dentro do container
+- [x] Publicação no Streamlit Community Cloud
 
 ### Próximas etapas
 
-- [ ] Publicação no Streamlit Community Cloud
 - [ ] Suporte a múltiplos PDFs
 - [ ] Suporte a Word
 - [ ] Suporte a Excel
