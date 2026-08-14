@@ -1,8 +1,4 @@
 # 🎓 EduAgent AI
-
-> Agente educacional inteligente baseado em **RAG (Retrieval-Augmented Generation)** e agentes de IA, capaz de responder perguntas com base no conteúdo de documentos fornecidos pelo usuário.
-
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 ![Python](https://img.shields.io/badge/Python-3.13-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.x-red)
 ![LangChain](https://img.shields.io/badge/LangChain-1.x-green)
@@ -10,77 +6,138 @@
 
 ---
 
-## 📌 Sobre o projeto
+O **EduAgent AI** é um agente de inteligência artificial capaz de responder
+perguntas em linguagem natural com base no conteúdo de documentos fornecidos
+pelo usuário.
 
-O **EduAgent AI** é um projeto desenvolvido durante a **Formação de Agentes de IA da Alura**, com foco na construção de um agente capaz de consultar documentos e responder perguntas em linguagem natural.
+A aplicação utiliza uma arquitetura RAG para carregar, processar, indexar e
+recuperar informações relevantes dos documentos antes de gerar uma resposta.
 
-A aplicação utiliza uma arquitetura baseada em **RAG**, combinando recuperação semântica de documentos com um agente ReAct para gerar respostas fundamentadas no conteúdo recuperado.
 
-Na versão atual, o sistema trabalha com **documentos PDF** enviados pelo usuário e apresenta as fontes utilizadas na resposta.
-
-O projeto está sendo desenvolvido de forma incremental, com foco em:
-
-- arquitetura modular;
-- RAG;
-- agentes de IA;
-- histórico conversacional;
-- rastreabilidade das fontes;
-- execução local e via Docker;
-- futura publicação em nuvem.
-
----
 
 ## 🎯 Objetivo
 
-Criar um assistente educacional capaz de:
+O projeto foi desenvolvido como parte do desafio da Formação de Agentes de IA
+da Alura.
 
-- receber documentos;
-- processar seu conteúdo;
-- criar uma representação vetorial;
-- recuperar informações relevantes;
-- responder perguntas em linguagem natural;
-- manter contexto entre perguntas;
-- informar as fontes consultadas;
-- evitar respostas baseadas em conhecimento externo ao documento.
+A solução permite consultar documentos educacionais e obter respostas baseadas
+no conteúdo disponível, evitando que o agente responda utilizando informações
+que não estejam presentes no documento consultado.
 
----
+## ✨ Funcionalidades
 
-## ✨ Funcionalidades atuais
+- 📄 Upload de documentos PDF
+- 📚 Documentos de demonstração incluídos no projeto
+- 🔍 Recuperação de informações utilizando RAG
+- 🧠 Busca semântica
+- 💬 Interface conversacional com Streamlit
+- 📑 Indicação das fontes consultadas
+- 💡 Sugestões de perguntas relacionadas ao documento
+- 📦 Validação do tamanho do arquivo
+- 📄 Validação da quantidade de páginas
+- 🐳 Execução através de Docker
 
-- [x] Interface web com Streamlit
-- [x] Upload de arquivos PDF
-- [x] Validação do tamanho do arquivo
-- [x] Processamento do PDF
-- [x] Chunking do conteúdo
-- [x] Geração de embeddings
-- [x] Indexação vetorial com FAISS
-- [x] Busca semântica
-- [x] Ferramenta `search_documents`
-- [x] Agente ReAct com LangGraph
-- [x] Integração com Groq
-- [x] Modelo `qwen/qwen3.6-27b`
-- [x] Histórico conversacional
-- [x] Perguntas consecutivas sem limpar a conversa
-- [x] Respostas baseadas no conteúdo recuperado
-- [x] Recusa quando a informação não está disponível no documento
-- [x] Exibição das fontes consultadas
-- [x] Limite de caracteres por pergunta
-- [x] Limite de histórico enviado ao agente
-- [x] Execução via Docker
+## 📏 Limites atuais
 
+Para manter o processamento adequado da aplicação:
+
+- **Tamanho máximo:** 10 MB por arquivo
+- **Quantidade máxima:** 50 páginas por documento
+
+A interface informa ao usuário o tamanho e a quantidade de páginas do arquivo
+antes da indexação.
+
+## 📚 Documentos de demonstração
+
+O projeto disponibiliza documentos educacionais de demonstração para que a
+aplicação possa ser testada imediatamente, sem necessidade de preparar ou
+enviar um documento próprio.
+
+Os documentos estão disponíveis em:
+
+`data/demo/`
+
+Incluem:
+
+1. Manual do Aluno
+2. Matrícula e Acesso
+3. Bolsas e Benefícios
+4. Avaliações e Recuperação
+5. Certificados
+6. Calendário Acadêmico
+7. Financeiro e Pagamentos
+8. Suporte e FAQ
+
+Na interface, selecione **Documentos de demonstração** e escolha um dos documentos disponíveis.
+
+## 🧠 Arquitetura 
+                   👤 Usuário
+                         │
+                         ▼
+                ┌─────────────────┐
+                │    Streamlit    │
+                │   Interface UI  │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │   Documento PDF │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │   PDF Loader    │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │    Chunking     │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │    Embeddings   │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │      FAISS      │
+                │ Vector Store    │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │    Retriever    │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │   Agente / LLM  │
+                └────────┬────────┘
+                         │
+                         ▼
+                💬 Resposta + fonte
 ---
 
 ## 🧪 Teste rápido
 
-A aplicação foi projetada para permitir testes por meio do upload de um PDF.
+A aplicação oferece duas formas de teste:
 
-### Fluxo
+- selecionar um dos documentos de demonstração disponíveis na interface;
+- enviar um PDF próprio pelo botão de upload.
+
+Para uma avaliação rápida, recomenda-se utilizar primeiro um dos documentos
+de demonstração.
+
+### 📚 Teste com documento de demonstração
 
 1. Abra a aplicação.
-2. Envie um arquivo PDF.
-3. Clique em **Indexar documento**.
-4. Faça perguntas sobre o conteúdo.
-5. Consulte as fontes apresentadas abaixo das respostas.
+2. Expanda **Documentos de demonstração**.
+3. Selecione um documento.
+4. Aguarde a indexação.
+5. Utilize uma das perguntas sugeridas.
+6. Faça perguntas adicionais sobre o conteúdo.
+7. Consulte as fontes apresentadas nas respostas.
 
 ### Exemplos de perguntas
 
@@ -129,46 +186,6 @@ Explique esse componente com mais detalhes.
 ```
 
 A segunda e a terceira pergunta devem utilizar o contexto da conversa anterior, mas continuar consultando o documento por meio do RAG.
-
----
-
-## 🧠 Arquitetura atual
-
-```text
-                           👤 Usuário
-                               │
-                               ▼
-                    ┌────────────────────┐
-                    │     Streamlit      │
-                    │   Interface Web    │
-                    └─────────┬──────────┘
-                              │
-                              ▼
-                    ┌────────────────────┐
-                    │    AgentService    │
-                    │     ReAct Agent    │
-                    └─────────┬──────────┘
-                              │
-                              ▼
-                    ┌────────────────────┐
-                    │  search_documents  │
-                    └─────────┬──────────┘
-                              │
-                              ▼
-                    ┌────────────────────┐
-                    │     RAGService     │
-                    │                    │
-                    │  Embeddings        │
-                    │  FAISS             │
-                    │  Retriever         │
-                    └─────────┬──────────┘
-                              │
-                              ▼
-                         📄 Documento
-                              │
-                              ▼
-                         🤖 Groq / Qwen
-```
 
 ---
 
@@ -374,9 +391,11 @@ Esses valores ficam centralizados nas configurações da aplicação e podem ser
 
 ### Streamlit Community Cloud
 
-🔄 **Próxima etapa**
+✅ **Publicado**
 
-A versão funcional será publicada para disponibilizar uma demonstração online.
+🔗 Aplicação online: `URL`
+
+A aplicação está disponível para testes online.
 
 ### Oracle Cloud Infrastructure (OCI)
 
@@ -429,7 +448,6 @@ _Adicionar aqui a URL pública após o deploy._
 ### Próximas etapas
 
 - [ ] Publicação no Streamlit Community Cloud
-- [ ] Criar documentos de demonstração
 - [ ] Suporte a múltiplos PDFs
 - [ ] Suporte a Word
 - [ ] Suporte a Excel
@@ -449,28 +467,6 @@ _Adicionar aqui a URL pública após o deploy._
 
 ---
 
-## 📚 Documentação técnica
-
-A documentação complementar do projeto será organizada no diretório:
-
-```text
-docs/
-```
-
-A documentação poderá incluir:
-
-- arquitetura;
-- fluxo RAG;
-- decisões técnicas;
-- processamento de documentos;
-- execução com Docker;
-- deploy;
-- evolução do projeto.
-
-O README permanece como ponto de entrada principal, enquanto o diretório `docs/` concentra explicações técnicas mais detalhadas.
-
----
-
 ## 🎓 Challenge Alura
 
 Este projeto faz parte do **Challenge da Formação de Agentes de IA da Alura**.
@@ -481,18 +477,11 @@ Este projeto faz parte do **Challenge da Formação de Agentes de IA da Alura**.
 - [ ] Deploy do agente na Oracle Cloud Infrastructure
 - [ ] Imagem ou vídeo da aplicação executando em nuvem no README
 
-### Situação atual
-
-O projeto já possui uma versão funcional executada localmente e em Docker.
-
-A próxima etapa é publicar essa versão e adicionar as evidências de execução em nuvem ao README.
-
----
 
 ## 👨‍💻 Autor
 
 **Daniel Farney**
 
-Engenheiro de IA Jr. | Dados | Python | IA Generativa
+Estudante de  IA | Dados | Python |
 
 GitHub: https://github.com/dfarneym

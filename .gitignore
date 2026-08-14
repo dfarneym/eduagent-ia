@@ -25,4 +25,6 @@ Thumbs.db
 # Python package metadata
 src/eduagent_ia.egg-info/
 
+# Documentação técnica local
+docs/
 

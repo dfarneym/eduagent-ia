@@ -67,11 +67,11 @@ def render_sidebar() -> None:
             "Manual do Aluno": "01_manual_do_aluno.pdf",
             "Matrícula e Acesso": "02_matricula_e_acesso.pdf",
             "Bolsas e Benefícios": "03_bolsas_e_beneficios.pdf",
-            "Avaliações e Recuperação": "04_avaliacoes_recuperacao.pdf",
+            "Avaliações e Recuperação": "04_avaliacoes_e_recuperacao.pdf",
             "Certificados": "05_certificados.pdf",
             "Calendário Acadêmico": "06_calendario_academico.pdf",
             "Financeiro e Pagamentos": "07_financeiro_e_pagamentos.pdf",
-            "Suporte e FAQ": "08_suporte_faq.pdf",
+            "Suporte e FAQ": "08_suporte_e_faq.pdf",
         }
 
         selected_demo = st.selectbox(
