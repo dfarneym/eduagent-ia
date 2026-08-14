@@ -243,13 +243,21 @@ A segunda e a terceira pergunta devem utilizar o contexto da conversa anterior, 
 > O suporte aos demais formatos faz parte da evolução planejada para atender integralmente ao escopo proposto pelo challenge.
 
 ---
-
+````
 ## 📁 Estrutura do projeto
 
-```text
 eduagent-ia/
 │
-├── docs/                      # Documentação técnica complementar
+├── data/
+│   └── demo/                  # Documentos PDF para demonstração
+│       ├── 01_manual_do_aluno.pdf
+│       ├── 02_matricula_e_acesso.pdf
+│       ├── 03_bolsas_e_beneficios.pdf
+│       ├── 04_avaliacoes_e_recuperacao.pdf
+│       ├── 05_certificados.pdf
+│       ├── 06_calendario_academico.pdf
+│       ├── 07_financeiro_e_pagamentos.pdf
+│       └── 08_suporte_e_faq.pdf
 │
 ├── src/
 │   └── eduagent/
@@ -264,8 +272,7 @@ eduagent-ia/
 ├── requirements.txt           # Dependências
 ├── README.md                  # Documentação principal
 └── .gitignore
-```
-
+````
 ---
 
 ## ⚙️ Pré-requisitos
