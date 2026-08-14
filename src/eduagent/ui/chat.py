@@ -7,6 +7,56 @@ import streamlit as st
 from eduagent.config.settings import settings
 from eduagent.services.agent_service import AgentService
 
+DEMO_QUESTIONS = {
+    "01_manual_do_aluno.pdf": [
+        "Como funciona o primeiro acesso?",
+        "Como é registrada a frequência?",
+        "Onde devo encaminhar dúvidas acadêmicas?",
+    ],
+    "02_matricula_e_acesso.pdf": [
+        "Como funciona a matrícula?",
+        "Como solicitar troca de turma?",
+        "Como recuperar minha senha?",
+    ],
+    "03_bolsas_e_beneficios.pdf": [
+        "Qual é o desconto da Bolsa de Desempenho?",
+        "Qual pode ser o desconto da Bolsa Socioeconômica?",
+        "Os benefícios podem ser acumulados?",
+    ],
+    "04_avaliacoes_e_recuperacao.pdf": [
+        "Qual é a nota mínima para aprovação?",
+        "Quem pode realizar recuperação?",
+        "Como funciona a revisão de avaliação?",
+    ],
+    "05_certificados.pdf": [
+        "Quais são os requisitos para receber o certificado?",
+        "Onde o certificado digital é disponibilizado?",
+        "Como solicitar uma segunda via?",
+    ],
+    "06_calendario_academico.pdf": [
+        "Quando começam as aulas?",
+        "Quando começam as avaliações finais?",
+        "Quando serão divulgadas as notas?",
+    ],
+    "07_financeiro_e_pagamentos.pdf": [
+        "Quais formas de pagamento são aceitas?",
+        "O que acontece quando uma mensalidade está atrasada?",
+        "Como solicitar uma negociação financeira?",
+    ],
+    "08_suporte_e_faq.pdf": [
+        "Como recuperar minha senha?",
+        "Onde vejo minhas notas?",
+        "Onde encontro meu certificado?",
+    ],
+}
+
+GENERIC_QUESTIONS = [
+    "Qual é o objetivo deste documento?",
+    "Quais são os principais pontos apresentados?",
+    "Explique os principais conceitos do documento.",
+    "Resuma o documento.",
+]
+
 
 def _render_sources(sources: list[dict]) -> None:
     """Renderiza as fontes consultadas pela resposta."""
@@ -38,42 +88,23 @@ def _render_welcome() -> None:
 
     if st.session_state.get("rag_initialized", False):
 
-        document_name = st.session_state.get(
-            "document_name",
-            "Documento",
-        )
+        document_name = st.session_state.document_name
 
-        st.markdown(
-            "### 💬 Assistente Educacional"
-        )
+        if document_name in DEMO_QUESTIONS:
+            suggested_questions = DEMO_QUESTIONS[document_name]
+        else:
+            suggested_questions = GENERIC_QUESTIONS
 
-        st.caption(
-            f"Faça perguntas sobre **{document_name}**."
-        )
+        st.markdown("**💡 Sugestões de perguntas**")
 
-        st.markdown(
-            "**Sugestões de perguntas:**"
-        )
-
-        suggestions = [
-            "Qual é o objetivo deste documento?",
-            "Quais são os principais pontos apresentados?",
-            "Explique um conceito encontrado no texto.",
-        ]
-
-        cols = st.columns(3)
-
-        for index, suggestion in enumerate(suggestions):
-
-            with cols[index]:
-
-                if st.button(
-                    suggestion,
-                    use_container_width=True,
-                    key=f"suggestion_{index}",
-                ):
-                    st.session_state.suggested_question = suggestion
-                    st.rerun()
+        for suggestion in suggested_questions:
+            if st.button(
+                suggestion,
+                key=f"suggestion_{suggestion}",
+                use_container_width=True,
+            ):
+                st.session_state.suggested_question = suggestion
+                st.rerun()
 
     else:
 

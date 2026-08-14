@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY app.py .
 COPY src ./src
 COPY .streamlit .streamlit
+COPY data/demo ./data/demo
 
 EXPOSE 8501
 

@@ -45,53 +45,147 @@ def render_sidebar() -> None:
 
         st.subheader("📄 Documento")
 
-        st.caption(
-               f"Tamanho máximo: {settings.MAX_FILE_SIZE_MB} MB"
+        # =========================================================
+        # DOCUMENTOS DE DEMONSTRAÇÃO
+        # =========================================================
+
+        st.markdown(
+            "**📚 Documentos de demonstração**"
         )
+
         st.caption(
-               f"📄 Máximo de páginas: {settings.MAX_PAGES}"
+            "Escolha um documento pronto para testar o EduAgent AI."
+        )
+
+        demo_dir = (
+            Path(__file__).resolve().parents[3]
+            / "data"
+            / "demo"
+        )
+
+        demo_documents = {
+            "Manual do Aluno": "01_manual_do_aluno.pdf",
+            "Matrícula e Acesso": "02_matricula_e_acesso.pdf",
+            "Bolsas e Benefícios": "03_bolsas_e_beneficios.pdf",
+            "Avaliações e Recuperação": "04_avaliacoes_recuperacao.pdf",
+            "Certificados": "05_certificados.pdf",
+            "Calendário Acadêmico": "06_calendario_academico.pdf",
+            "Financeiro e Pagamentos": "07_financeiro_e_pagamentos.pdf",
+            "Suporte e FAQ": "08_suporte_faq.pdf",
+        }
+
+        selected_demo = st.selectbox(
+            "Documento de demonstração",
+            options=list(demo_documents.keys()),
+        )
+
+        if st.button(
+            "📚 Usar documento de demonstração",
+            use_container_width=True,
+            type="secondary",
+        ):
+            demo_path = (
+                demo_dir
+                / demo_documents[selected_demo]
+            )
+
+            if not demo_path.exists():
+
+                st.error(
+                    "O documento de demonstração não foi encontrado."
+                )
+
+            else:
+
+                with st.spinner(
+                    "Carregando e indexando documento..."
+                ):
+                    try:
+
+                        initialize_rag(
+                            str(demo_path)
+                        )
+
+                        st.session_state.rag_initialized = True
+
+                        st.session_state.document_name = (
+                            demo_documents[selected_demo]
+                        )
+
+                        st.session_state.agent = None
+
+                        # Um novo documento começa uma nova conversa.
+                        st.session_state.messages = []
+
+                        st.success(
+                            "Documento de demonstração indexado "
+                            "com sucesso!"
+                        )
+
+                        st.rerun()
+
+                    except Exception as error:
+
+                        st.error(
+                            f"Erro ao indexar documento: {error}"
+                        )
+
+        st.divider()
+
+        # =========================================================
+        # UPLOAD DE DOCUMENTO PRÓPRIO
+        # =========================================================
+
+        st.markdown(
+            "**📤 Ou envie seu próprio PDF**"
+        )
+
+        st.caption(
+            f"📦 Tamanho máximo: {settings.MAX_FILE_SIZE_MB} MB"
+        )
+
+        st.caption(
+            f"📄 Máximo de páginas: {settings.MAX_PAGES}"
         )
 
         uploaded_file = st.file_uploader(
-             "Selecione um arquivo PDF",
-             type=["pdf"],
-             max_upload_size=settings.MAX_FILE_SIZE_MB,
-             help=(
-                  f"PDF de até {settings.MAX_FILE_SIZE_MB} MB "
-                  f"e {settings.MAX_PAGES} páginas."
-           ),
+            "Selecione um arquivo PDF",
+            type=["pdf"],
+            max_upload_size=settings.MAX_FILE_SIZE_MB,
+            help=(
+                f"Envie um arquivo PDF de até "
+                f"{settings.MAX_FILE_SIZE_MB} MB "
+                f"e {settings.MAX_PAGES} páginas."
+            ),
         )
 
         if uploaded_file is not None:
 
-            file_size_mb = uploaded_file.size / (1024 * 1024)
+            file_size_mb = (
+                uploaded_file.size / (1024 * 1024)
+            )
 
             st.caption(
                 f"Arquivo selecionado: **{uploaded_file.name}**"
             )
-
-            # -------------------------------------------------
-            # Validação de tamanho
-            # -------------------------------------------------
 
             file_size_valid = (
                 uploaded_file.size
                 <= settings.MAX_FILE_SIZE_MB * 1024 * 1024
             )
 
-            # -------------------------------------------------
-            # Validação de páginas
-            # -------------------------------------------------
-
             page_count = None
             page_count_valid = True
 
             try:
+
                 from io import BytesIO
                 from pypdf import PdfReader
 
                 reader = PdfReader(
-                    BytesIO(uploaded_file.getvalue())
+                    BytesIO(
+                        uploaded_file.getvalue()
+                    )
                 )
 
                 page_count = len(reader.pages)
@@ -101,16 +195,13 @@ def render_sidebar() -> None:
                 )
 
             except Exception as error:
+
                 page_count_valid = False
 
                 st.error(
-                    f"Não foi possível verificar o número de "
-                    f"páginas do PDF: {error}"
+                    f"Não foi possível verificar o número "
+                    f"de páginas do PDF: {error}"
                 )
-
-            # -------------------------------------------------
-            # Informações do arquivo
-            # -------------------------------------------------
 
             st.caption(
                 f"📦 Tamanho: {file_size_mb:.2f} MB"
@@ -120,10 +211,6 @@ def render_sidebar() -> None:
                 st.caption(
                     f"📄 Páginas: {page_count}"
                 )
-
-            # -------------------------------------------------
-            # Mensagens de validação
-            # -------------------------------------------------
 
             if not file_size_valid:
 
@@ -145,10 +232,6 @@ def render_sidebar() -> None:
                 st.success(
                     "Documento dentro dos limites permitidos."
                 )
-
-            # -------------------------------------------------
-            # Indexação
-            # -------------------------------------------------
 
             can_index = (
                 file_size_valid
@@ -206,7 +289,7 @@ def render_sidebar() -> None:
                             f"Erro ao indexar documento: {error}"
                         )
 
-  
+
         st.divider()
 
         st.subheader("📊 Status")
