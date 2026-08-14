@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     APP_NAME: str = "EduAgent AI"
     APP_VERSION: str = "0.1.0"
 
+    # Limites da aplicação
+    MAX_FILE_SIZE_MB: int = 10
+    MAX_PAGES: int = 50
+    MAX_QUESTION_CHARS: int = 2000
+    MAX_HISTORY_MESSAGES: int = 10
+
     # Carregamento das variáveis de ambiente
     model_config = SettingsConfigDict(
         env_file=".env",

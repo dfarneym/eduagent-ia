@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 
 import streamlit as st
+from pypdf import PdfReader
 
 from eduagent.config.settings import settings
 from eduagent.tools.rag_tool import initialize_rag
@@ -44,27 +45,130 @@ def render_sidebar() -> None:
 
         st.subheader("📄 Documento")
 
+        st.caption(
+               f"Tamanho máximo: {settings.MAX_FILE_SIZE_MB} MB"
+        )
+        st.caption(
+               f"📄 Máximo de páginas: {settings.MAX_PAGES}"
+        )
+
         uploaded_file = st.file_uploader(
-            "Selecione um arquivo PDF",
-            type=["pdf"],
-            help="Envie um documento para que o EduAgent possa consultá-lo.",
+             "Selecione um arquivo PDF",
+             type=["pdf"],
+             max_upload_size=settings.MAX_FILE_SIZE_MB,
+             help=(
+                  f"PDF de até {settings.MAX_FILE_SIZE_MB} MB "
+                  f"e {settings.MAX_PAGES} páginas."
+           ),
         )
 
         if uploaded_file is not None:
 
+            file_size_mb = uploaded_file.size / (1024 * 1024)
+
             st.caption(
                 f"Arquivo selecionado: **{uploaded_file.name}**"
+            )
+
+            # -------------------------------------------------
+            # Validação de tamanho
+            # -------------------------------------------------
+
+            file_size_valid = (
+                uploaded_file.size
+                <= settings.MAX_FILE_SIZE_MB * 1024 * 1024
+            )
+
+            # -------------------------------------------------
+            # Validação de páginas
+            # -------------------------------------------------
+
+            page_count = None
+            page_count_valid = True
+
+            try:
+                from io import BytesIO
+                from pypdf import PdfReader
+
+                reader = PdfReader(
+                    BytesIO(uploaded_file.getvalue())
+                )
+
+                page_count = len(reader.pages)
+
+                page_count_valid = (
+                    page_count <= settings.MAX_PAGES
+                )
+
+            except Exception as error:
+                page_count_valid = False
+
+                st.error(
+                    f"Não foi possível verificar o número de "
+                    f"páginas do PDF: {error}"
+                )
+
+            # -------------------------------------------------
+            # Informações do arquivo
+            # -------------------------------------------------
+
+            st.caption(
+                f"📦 Tamanho: {file_size_mb:.2f} MB"
+            )
+
+            if page_count is not None:
+                st.caption(
+                    f"📄 Páginas: {page_count}"
+                )
+
+            # -------------------------------------------------
+            # Mensagens de validação
+            # -------------------------------------------------
+
+            if not file_size_valid:
+
+                st.error(
+                    f"O arquivo excede o limite de "
+                    f"{settings.MAX_FILE_SIZE_MB} MB."
+                )
+
+            elif not page_count_valid and page_count is not None:
+
+                st.error(
+                    f"O documento possui {page_count} páginas, "
+                    f"mas o limite é de "
+                    f"{settings.MAX_PAGES} páginas."
+                )
+
+            else:
+
+                st.success(
+                    "Documento dentro dos limites permitidos."
+                )
+
+            # -------------------------------------------------
+            # Indexação
+            # -------------------------------------------------
+
+            can_index = (
+                file_size_valid
+                and page_count_valid
+                and page_count is not None
             )
 
             if st.button(
                 "📥 Indexar documento",
                 use_container_width=True,
                 type="secondary",
+                disabled=not can_index,
             ):
+
                 with st.spinner(
                     "Carregando e indexando documento..."
                 ):
+
                     try:
+
                         with tempfile.TemporaryDirectory() as temp_dir:
 
                             file_path = (
@@ -81,15 +185,13 @@ def render_sidebar() -> None:
                             )
 
                         st.session_state.rag_initialized = True
+
                         st.session_state.document_name = (
                             uploaded_file.name
                         )
 
-                        # O agente anterior pode ter sido criado
-                        # com o estado anterior da aplicação.
                         st.session_state.agent = None
 
-                        # Um novo documento começa uma nova conversa.
                         st.session_state.messages = []
 
                         st.success(
@@ -104,6 +206,7 @@ def render_sidebar() -> None:
                             f"Erro ao indexar documento: {error}"
                         )
 
+  
         st.divider()
 
         st.subheader("📊 Status")

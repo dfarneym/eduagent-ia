@@ -1,340 +1,498 @@
 # 🎓 EduAgent AI
 
-> Agente Inteligente para Atendimento Educacional utilizando IA Generativa e RAG (Retrieval-Augmented Generation).
+> Agente educacional inteligente baseado em **RAG (Retrieval-Augmented Generation)** e agentes de IA, capaz de responder perguntas com base no conteúdo de documentos fornecidos pelo usuário.
 
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 ![Python](https://img.shields.io/badge/Python-3.13-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.x-red)
 ![LangChain](https://img.shields.io/badge/LangChain-1.x-green)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.60-red)
-![License](https://img.shields.io/badge/license-MIT-purple)
+![Docker](https://img.shields.io/badge/Docker-enabled-blue)
 
 ---
 
-## 📌 Sobre este repositório
+## 📌 Sobre o projeto
 
-Este projeto está sendo desenvolvido de forma incremental durante a **Formação de Agentes de IA da Alura**.
+O **EduAgent AI** é um projeto desenvolvido durante a **Formação de Agentes de IA da Alura**, com foco na construção de um agente capaz de consultar documentos e responder perguntas em linguagem natural.
 
-Cada Sprint representa uma etapa da construção da solução, desde a definição da arquitetura até a implementação de um agente inteligente baseado em **RAG (Retrieval-Augmented Generation)**, utilizando boas práticas de Engenharia de Software, Inteligência Artificial e desenvolvimento de aplicações Python.
+A aplicação utiliza uma arquitetura baseada em **RAG**, combinando recuperação semântica de documentos com um agente ReAct para gerar respostas fundamentadas no conteúdo recuperado.
 
-Além de atender aos requisitos do desafio, este repositório documenta toda a evolução do projeto, incluindo decisões arquiteturais, aprendizados, documentação técnica e boas práticas adotadas durante o desenvolvimento.
+Na versão atual, o sistema trabalha com **documentos PDF** enviados pelo usuário e apresenta as fontes utilizadas na resposta.
 
----
+O projeto está sendo desenvolvido de forma incremental, com foco em:
 
-## 📖 Sobre o Projeto
-
-O **EduAgent AI** é uma plataforma inteligente desenvolvida para responder perguntas em linguagem natural com base na documentação de uma instituição de ensino.
-
-A aplicação utiliza técnicas de **RAG (Retrieval-Augmented Generation)** para localizar informações relevantes em documentos institucionais, permitindo que estudantes obtenham respostas rápidas sobre regulamentos, bolsas, certificados, políticas acadêmicas, perguntas frequentes e demais conteúdos oficiais.
-
-O projeto foi concebido para servir como base de uma plataforma escalável de atendimento educacional, separando responsabilidades em módulos independentes para facilitar manutenção, testes e evolução da aplicação.
-
----
-
-## 🔮 Visão do Projeto
-
-O EduAgent AI nasce como solução para o desafio final da Formação de Agentes de IA da Alura.
-
-Após a conclusão do desafio, a arquitetura será expandida para atender um cenário real de negócio, evoluindo para uma plataforma inteligente destinada a instituições de ensino e cursos online.
-
-Entre as evoluções planejadas estão:
-
-- 🌐 Landing Page institucional
-- 🎓 Plataforma de ensino online
-- 🤖 Assistente inteligente baseado em IA
-- 📄 Consulta inteligente à documentação institucional utilizando RAG
-- 💬 Atendimento integrado ao Website
-- 📱 Integração com WhatsApp
-- ✈️ Integração com Telegram
-- 🔄 Automação de processos utilizando n8n
-- 📊 Painel administrativo para gestão da plataforma
+- arquitetura modular;
+- RAG;
+- agentes de IA;
+- histórico conversacional;
+- rastreabilidade das fontes;
+- execução local e via Docker;
+- futura publicação em nuvem.
 
 ---
 
-## 📚 Jornada de Aprendizado
+## 🎯 Objetivo
 
-Este projeto faz parte da minha jornada de estudos em **Engenharia de Inteligência Artificial**.
+Criar um assistente educacional capaz de:
 
-Durante seu desenvolvimento estou consolidando conhecimentos em:
+- receber documentos;
+- processar seu conteúdo;
+- criar uma representação vetorial;
+- recuperar informações relevantes;
+- responder perguntas em linguagem natural;
+- manter contexto entre perguntas;
+- informar as fontes consultadas;
+- evitar respostas baseadas em conhecimento externo ao documento.
 
-- 🐍 Arquitetura de aplicações Python
-- 🏗️ Arquitetura modular e organização de projetos
-- 🤖 Desenvolvimento de Agentes de IA
-- 🔗 LangChain
-- 📚 RAG (Retrieval-Augmented Generation)
-- ✍️ Engenharia de Prompts
-- 🧩 Processamento e segmentação de documentos (Chunking)
-- 🧠 Embeddings e Busca Semântica
-- 🗄️ Bancos Vetoriais (FAISS)
-- 💬 Integração com LLMs (Google Gemini)
-- 🎨 Desenvolvimento de interfaces com Streamlit
-- ⚙️ Engenharia de Software e Clean Architecture
-- ☁️ Deploy de aplicações na Oracle Cloud Infrastructure (OCI)
-- 🔄 Automação de fluxos com n8n (próximas etapas)
+---
 
-## 🎯 Objetivos
+## ✨ Funcionalidades atuais
 
-- Construir um agente utilizando LangChain
-- Implementar um pipeline completo de RAG
-- Utilizar um banco vetorial (FAISS)
-- Integrar o Gemini
-- Criar uma interface utilizando Streamlit
-- Implantar na Oracle Cloud (OCI)
-- Evoluir para uma plataforma educacional inteligente
+- [x] Interface web com Streamlit
+- [x] Upload de arquivos PDF
+- [x] Validação do tamanho do arquivo
+- [x] Processamento do PDF
+- [x] Chunking do conteúdo
+- [x] Geração de embeddings
+- [x] Indexação vetorial com FAISS
+- [x] Busca semântica
+- [x] Ferramenta `search_documents`
+- [x] Agente ReAct com LangGraph
+- [x] Integração com Groq
+- [x] Modelo `qwen/qwen3.6-27b`
+- [x] Histórico conversacional
+- [x] Perguntas consecutivas sem limpar a conversa
+- [x] Respostas baseadas no conteúdo recuperado
+- [x] Recusa quando a informação não está disponível no documento
+- [x] Exibição das fontes consultadas
+- [x] Limite de caracteres por pergunta
+- [x] Limite de histórico enviado ao agente
+- [x] Execução via Docker
 
-## 🏗️ Arquitetura Atual
+---
+
+## 🧪 Teste rápido
+
+A aplicação foi projetada para permitir testes por meio do upload de um PDF.
+
+### Fluxo
+
+1. Abra a aplicação.
+2. Envie um arquivo PDF.
+3. Clique em **Indexar documento**.
+4. Faça perguntas sobre o conteúdo.
+5. Consulte as fontes apresentadas abaixo das respostas.
+
+### Exemplos de perguntas
+
+Use perguntas relacionadas ao conteúdo do documento, por exemplo:
 
 ```text
-                       👤 Usuário
-                             │
-                             ▼
-                  ┌──────────────────────┐
-                  │   🚀 app.py          │
-                  │ Ponto de Entrada     │
-                  └──────────┬───────────┘
-                             │
-                             ▼
-                  ┌──────────────────────┐
-                  │ 🖥️ Streamlit UI       │
-                  │ Interface Principal  │
-                  └──────────┬───────────┘
-                             │
-                             ▼
-                  ┌──────────────────────┐
-                  │ 🧩 Componentes UI     │
-                  │ Página • Sidebar     │
-                  └──────────┬───────────┘
-                             │
-                             ▼
-                  ┌──────────────────────┐
-                  │ ⚙️ Configurações      │
-                  │ settings.py          │
-                  └──────────┬───────────┘
-                             │
-                             ▼
-                  ┌──────────────────────┐
-                  │ 📦 Estrutura Modular  │
-                  │ src/eduagent         │
-                  └──────────────────────┘
+Qual é o objetivo deste documento?
+
+Qual componente é responsável por isso?
+
+E o que ele deve retornar?
+
+Explique esse componente com mais detalhes.
+
+Resuma o documento.
 ```
 
-## 🔮 Arquitetura Final
+### Teste de conhecimento externo
 
-```mermaid
-flowchart TD
+Também é possível testar a regra de contenção do agente:
 
-A[👤 Usuário]
-
-B[🖥️ Streamlit]
-
-C[💬 Chat]
-
-D[RAG Service]
-
-E[Retriever]
-
-F[Prompt Builder]
-
-G[FAISS]
-
-H[Google Gemini]
-
-I[Embeddings]
-
-J[Chunking]
-
-K[Document Loader]
-
-L[(PDFs / CSV)]
-
-A --> B
-B --> C
-C --> D
-
-D --> E
-D --> F
-
-E --> G
-G --> I
-I --> J
-J --> K
-K --> L
-
-F --> H
+```text
+Qual é a capital do Brasil?
 ```
 
-## 🚀 Tecnologias
+Quando essa informação não estiver presente no documento, o agente deve informar que ela não foi encontrada nos documentos disponíveis.
 
-- Python 3.13
-- Streamlit
-- LangChain
-- Google Gemini
-- FAISS
-- Pydantic
-- python-dotenv
-- PyPDF
-- Pandas
-- Git
-- GitHub
+### Teste de contexto
 
-## 📁 Estrutura do Projeto
+Faça uma sequência como:
+
+```text
+Qual é o objetivo deste documento?
+```
+
+Depois:
+
+```text
+Qual componente é responsável por isso?
+```
+
+E:
+
+```text
+Explique esse componente com mais detalhes.
+```
+
+A segunda e a terceira pergunta devem utilizar o contexto da conversa anterior, mas continuar consultando o documento por meio do RAG.
+
+---
+
+## 🧠 Arquitetura atual
+
+```text
+                           👤 Usuário
+                               │
+                               ▼
+                    ┌────────────────────┐
+                    │     Streamlit      │
+                    │   Interface Web    │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │    AgentService    │
+                    │     ReAct Agent    │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │  search_documents  │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │     RAGService     │
+                    │                    │
+                    │  Embeddings        │
+                    │  FAISS             │
+                    │  Retriever         │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                         📄 Documento
+                              │
+                              ▼
+                         🤖 Groq / Qwen
+```
+
+---
+
+## 🔎 Fluxo de processamento
+
+1. O usuário envia um PDF pela interface.
+2. O arquivo é salvo temporariamente para processamento.
+3. O loader extrai o conteúdo.
+4. O conteúdo é dividido em trechos.
+5. São gerados embeddings.
+6. Os embeddings são indexados no FAISS.
+7. O usuário faz uma pergunta.
+8. O agente utiliza `search_documents`.
+9. O RAG recupera os trechos mais relevantes.
+10. O modelo gera a resposta usando o contexto recuperado.
+11. As fontes consultadas são apresentadas na interface.
+
+---
+
+## 🛠️ Tecnologias utilizadas
+
+| Camada | Tecnologia |
+|---|---|
+| Linguagem | Python 3.13 |
+| Interface | Streamlit |
+| Agentes | LangGraph |
+| Orquestração | LangChain |
+| LLM | Groq + Qwen |
+| Embeddings | Sentence Transformers |
+| Busca vetorial | FAISS |
+| Leitura de PDF | PyPDF |
+| Configuração | Pydantic Settings |
+| Variáveis de ambiente | python-dotenv |
+| Containerização | Docker |
+| Versionamento | Git / GitHub |
+
+---
+
+## 📄 Formatos de documentos
+
+### Suporte atual
+
+- [x] PDF
+
+### Evolução planejada
+
+- [ ] Word (`.docx`)
+- [ ] Excel (`.xlsx`)
+- [ ] PowerPoint (`.pptx`)
+- [ ] Markdown (`.md`)
+- [ ] CSV
+- [ ] JSON
+- [ ] HTML
+
+> O suporte aos demais formatos faz parte da evolução planejada para atender integralmente ao escopo proposto pelo challenge.
+
+---
+
+## 📁 Estrutura do projeto
 
 ```text
 eduagent-ia/
 │
-├── docs/                  # Documentação técnica
-├── src/                   # Código-fonte da aplicação
-│   └── eduagent/
-│       ├── config/        # Configurações
-│       ├── embeddings/    # Geração de embeddings
-│       ├── loaders/       # Leitura de documentos
-│       ├── prompts/       # Templates de prompts
-│       ├── retrievers/    # Recuperação de contexto
-│       ├── services/      # Regras de negócio
-│       ├── splitters/     # Divisão de documentos
-│       ├── ui/            # Interface Streamlit
-│       ├── utils/         # Funções auxiliares
-│       └── vectorstore/   # Banco vetorial
+├── docs/                      # Documentação técnica complementar
 │
-├── app.py                 # Ponto de entrada da aplicação
-├── requirements.txt       # Dependências
-├── README.md              # Documentação principal
+├── src/
+│   └── eduagent/
+│       ├── config/            # Configurações
+│       ├── loaders/           # Leitura de documentos
+│       ├── services/          # Regras de negócio
+│       ├── tools/             # Ferramentas do agente
+│       └── ui/                # Interface Streamlit
+│
+├── app.py                     # Ponto de entrada
+├── Dockerfile                 # Configuração da imagem Docker
+├── requirements.txt           # Dependências
+├── README.md                  # Documentação principal
 └── .gitignore
 ```
 
-## ✅ Funcionalidades
+---
 
-- [x] Estrutura do projeto
-- [x] Configuração centralizada
-- [x] Interface inicial
-- [x] Sidebar
-- [ ] Loader PDF
-- [ ] Splitter
-- [ ] Embeddings
-- [ ] Banco Vetorial
-- [ ] Retriever
-- [ ] Chat
-- [ ] Memória
-- [ ] Deploy OCI
+## ⚙️ Pré-requisitos
 
-## 🛣️ Roadmap
-
-Sprint 1 ✅ Ambiente
-
-Sprint 2 ✅ Arquitetura
-
-Sprint 3 ✅ GitHub
-
-Sprint 4 🔄 Interface
-
-Sprint 5 ⏳ Loader
-
-Sprint 6 ⏳ Chunking
-
-Sprint 7 ⏳ Embeddings
-
-Sprint 8 ⏳ FAISS
-
-Sprint 9 ⏳ Retriever
-
-Sprint 10 ⏳ RAG
-
-Sprint 11 ⏳ Deploy
-
-## 📋 Pré-requisitos
-
-Antes de iniciar, certifique-se de possuir:
+Para executar localmente:
 
 - Python 3.13+
 - Git
-- Conta Google AI Studio
-- Chave da API do Gemini
-- VS Code (recomendado)
+- chave de API da Groq
 
-## 🚀 Como executar
+Para execução com Docker:
 
-### 1️⃣ Clonar o repositório
+- Docker Desktop ou Docker Engine
+
+---
+
+## 🚀 Execução local
+
+### 1. Clonar o repositório
 
 ```bash
 git clone https://github.com/dfarneym/eduagent-ia.git
-```
-
-### 2️⃣ Acessar a pasta do projeto
-
-```bash
 cd eduagent-ia
 ```
 
-### 3️⃣ Criar o ambiente virtual
+### 2. Criar o ambiente virtual
 
 ```bash
 python -m venv .venv
 ```
 
-### 4️⃣ Ativar o ambiente virtual
+### 3. Ativar o ambiente
 
-**Windows (PowerShell)**
+#### Windows PowerShell
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-**Windows (CMD)**
+#### Windows CMD
 
 ```cmd
 .venv\Scripts\activate.bat
 ```
 
-**Linux / macOS**
+#### Linux / macOS
 
 ```bash
 source .venv/bin/activate
 ```
 
-### 5️⃣ Instalar as dependências
+### 4. Instalar dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 6️⃣ Configurar as variáveis de ambiente
+### 5. Configurar variáveis de ambiente
 
 Crie um arquivo `.env` na raiz do projeto:
 
 ```env
-GOOGLE_API_KEY=sua_chave_api
+GROQ_API_KEY=sua_chave_aqui
+MODEL_NAME=qwen/qwen3.6-27b
 ```
 
-### 7️⃣ Executar a aplicação
+> O arquivo `.env` não deve ser versionado no Git.
+
+### 6. Executar a aplicação
 
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
-Após a inicialização, acesse:
+Acesse:
 
 ```text
 http://localhost:8501
 ```
 
-## 🔮 Evolução do projeto
+---
 
-Após concluir o desafio, a arquitetura será expandida para:
+## 🐳 Execução com Docker
 
-- Plataforma completa de ensino de Espanhol
-- Landing Page
-- Área do aluno
-- Chat inteligente
-- Integração WhatsApp
-- Integração Telegram
-- N8N
-- Dashboard Administrativo
+### Construir a imagem
+
+```bash
+docker build -t eduagent-ai .
+```
+
+### Executar
+
+```bash
+docker run --name eduagent \
+  -p 8501:8501 \
+  --env-file .env \
+  eduagent-ai
+```
+
+Acesse:
+
+```text
+http://localhost:8501
+```
+
+---
+
+## 🔐 Limites atuais
+
+Para evitar processamento excessivo, a aplicação possui limites configuráveis:
+
+```text
+Tamanho máximo do arquivo: 10 MB
+Máximo de caracteres por pergunta: 2.000
+Máximo de mensagens consideradas no histórico: 10
+```
+
+Esses valores ficam centralizados nas configurações da aplicação e podem ser ajustados conforme a evolução do projeto.
+
+---
+
+## ☁️ Deploy
+
+### Streamlit Community Cloud
+
+🔄 **Próxima etapa**
+
+A versão funcional será publicada para disponibilizar uma demonstração online.
+
+### Oracle Cloud Infrastructure (OCI)
+
+⏳ **Planejado**
+
+O deploy final será realizado na Oracle Cloud Infrastructure, atendendo ao requisito de utilização de pelo menos um serviço OCI no challenge.
+
+Após a publicação, esta seção será atualizada com:
+
+- URL da aplicação;
+- serviço OCI utilizado;
+- instruções de execução;
+- evidência da aplicação rodando em nuvem.
+
+---
+
+## 📸 Demonstração
+
+> Esta seção será atualizada após a publicação online.
+
+### Aplicação em execução
+
+_Adicionar aqui uma captura de tela da aplicação rodando na nuvem._
+
+### Link da aplicação
+
+_Adicionar aqui a URL pública após o deploy._
+
+---
+
+## 🛣️ Roadmap
+
+### Concluído
+
+- [x] Estrutura inicial do projeto
+- [x] Arquitetura modular
+- [x] Interface Streamlit
+- [x] PDF Loader
+- [x] Chunking
+- [x] Embeddings
+- [x] FAISS
+- [x] RAG
+- [x] Agente ReAct
+- [x] Histórico conversacional
+- [x] Fontes consultadas
+- [x] Limites de entrada
+- [x] Docker
+- [x] Execução do sistema dentro do container
+
+### Próximas etapas
+
+- [ ] Publicação no Streamlit Community Cloud
+- [ ] Criar documentos de demonstração
+- [ ] Suporte a múltiplos PDFs
+- [ ] Suporte a Word
+- [ ] Suporte a Excel
+- [ ] Suporte a PowerPoint
+- [ ] Suporte a Markdown
+- [ ] Suporte a CSV
+- [ ] Suporte a JSON
+- [ ] Suporte a HTML
+- [ ] Melhorar memória/contexto
+- [ ] Melhorar apresentação das fontes
+- [ ] Melhorar tratamento de erros
+- [ ] Criar testes automatizados
+- [ ] Reduzir o tamanho da imagem Docker
+- [ ] Deploy na OCI
+- [ ] Documentação final
+- [ ] Evidência da execução em nuvem
+
+---
+
+## 📚 Documentação técnica
+
+A documentação complementar do projeto será organizada no diretório:
+
+```text
+docs/
+```
+
+A documentação poderá incluir:
+
+- arquitetura;
+- fluxo RAG;
+- decisões técnicas;
+- processamento de documentos;
+- execução com Docker;
+- deploy;
+- evolução do projeto.
+
+O README permanece como ponto de entrada principal, enquanto o diretório `docs/` concentra explicações técnicas mais detalhadas.
+
+---
+
+## 🎓 Challenge Alura
+
+Este projeto faz parte do **Challenge da Formação de Agentes de IA da Alura**.
+
+### Requisitos do challenge
+
+- [x] Repositório público no GitHub
+- [ ] Deploy do agente na Oracle Cloud Infrastructure
+- [ ] Imagem ou vídeo da aplicação executando em nuvem no README
+
+### Situação atual
+
+O projeto já possui uma versão funcional executada localmente e em Docker.
+
+A próxima etapa é publicar essa versão e adicionar as evidências de execução em nuvem ao README.
+
+---
 
 ## 👨‍💻 Autor
 
-Daniel Farney
+**Daniel Farney**
 
 Engenheiro de IA Jr. | Dados | Python | IA Generativa
 
-LinkedIn
-
-GitHub
+GitHub: https://github.com/dfarneym

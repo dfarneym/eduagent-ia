@@ -4,6 +4,7 @@ Interface principal de conversação do EduAgent AI.
 
 import streamlit as st
 
+from eduagent.config.settings import settings
 from eduagent.services.agent_service import AgentService
 
 
@@ -146,6 +147,15 @@ def render_chat() -> None:
     if not question:
         return
 
+    question = question.strip()
+
+    if len(question) > settings.MAX_QUESTION_CHARS:
+        st.warning(
+            f"A pergunta deve ter no máximo "
+            f"{settings.MAX_QUESTION_CHARS} caracteres."
+        )
+        return
+
     # Limpa a sugestão depois de utilizá-la
     st.session_state.suggested_question = None
 
@@ -190,6 +200,9 @@ def render_chat() -> None:
         ):
 
             try:
+                conversation_history = st.session_state.messages[
+                      -settings.MAX_HISTORY_MESSAGES:
+                ].copy()
                 
                 agent = AgentService()
 
