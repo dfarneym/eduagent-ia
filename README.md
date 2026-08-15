@@ -446,8 +446,6 @@ Esta etapa permanece como requisito pendente do Challenge e será documentada no
 
 ## 📸 Demonstração
 
-## 📸 Demonstração
-
 ### Interface principal
 
 🔗 Aplicação online: `https://eduagent-ia-dk7w4kiyu2zetyb5ixkstg.streamlit.app/`
