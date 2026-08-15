@@ -5,20 +5,45 @@
 ![Docker](https://img.shields.io/badge/Docker-enabled-blue)
 
 ---
+## 📌 Sobre este repositório
 
-O **EduAgent AI** é um agente de inteligência artificial capaz de responder
-perguntas em linguagem natural com base no conteúdo de documentos fornecidos
-pelo usuário.
+Este projeto está sendo desenvolvido de forma incremental durante a **Formação de Agentes de IA da Alura**.
 
-A aplicação utiliza uma arquitetura RAG para carregar, processar, indexar e
-recuperar informações relevantes dos documentos antes de gerar uma resposta.
+Cada Sprint representa uma etapa da construção da solução, desde a definição da arquitetura até a implementação de um agente inteligente baseado em **RAG (Retrieval-Augmented Generation)**, utilizando boas práticas de Engenharia de Software, Inteligência Artificial e desenvolvimento de aplicações Python.
 
+Além de atender aos requisitos do desafio, este repositório documenta toda a evolução do projeto, incluindo decisões arquiteturais, aprendizados, documentação técnica e boas práticas adotadas durante o desenvolvimento.
 
+---
 
-## 🎯 Objetivo
+## 📖 Sobre o Projeto
 
-O projeto foi desenvolvido como parte do desafio da Formação de Agentes de IA
-da Alura.
+O **EduAgent AI** é uma plataforma inteligente desenvolvida para responder perguntas em linguagem natural com base na documentação de uma instituição de ensino.
+
+A aplicação utiliza técnicas de **RAG (Retrieval-Augmented Generation)** para localizar informações relevantes em documentos institucionais, permitindo que estudantes obtenham respostas rápidas sobre regulamentos, bolsas, certificados, políticas acadêmicas, perguntas frequentes e demais conteúdos oficiais.
+
+O projeto foi concebido para servir como base de uma plataforma escalável de atendimento educacional, separando responsabilidades em módulos independentes para facilitar manutenção, testes e evolução da aplicação.
+
+---
+
+## 🔮 Visão do Projeto
+
+O EduAgent AI nasce como solução para o desafio final da Formação de Agentes de IA da Alura.
+
+Após a conclusão do desafio, a arquitetura será expandida para atender um cenário real de negócio, evoluindo para uma plataforma inteligente destinada a instituições de ensino e cursos online.
+
+Entre as evoluções planejadas estão:
+
+- 🌐 Landing Page institucional
+- 🎓 Plataforma de ensino online
+- 🤖 Assistente inteligente baseado em IA
+- 📄 Consulta inteligente à documentação institucional utilizando RAG
+- 💬 Atendimento integrado ao Website
+- 📱 Integração com WhatsApp
+- ✈️ Integração com Telegram
+- 🔄 Automação de processos utilizando n8n
+- 📊 Painel administrativo para gestão da plataforma
+
+---
 
 A solução permite consultar documentos educacionais e obter respostas baseadas
 no conteúdo disponível, evitando que o agente responda utilizando informações
